@@ -1,0 +1,50 @@
+Time Use Project Codebook: 
+
+Variable                         Description 
+---------------           -------------------------
+Country                   The country of origin of the participants. 33 possible values:                  
+                          Australia, Austria, Belgium, Canada, Denmark, Estonia, Finland, France, 
+				  Germany, Greece, Hungary, Ireland, Italy, Japan, Korea, Latvia, Lithuania, 
+				  Luxembourg, Mexico, Netherlands, New Zealand, Norway, Poland, Portugal, 
+				  Slovenia, Spain, Sweden, Turkey, UK, USA, China, India, South Africa
+
+
+Category                  Data from time-use diaries and questionnaires were sorted into 14 activity categories: 
+                          Paid work, education, care for household  members,housework, shopping, other unpaid 
+				  work & volunteering, sleep, eating & drinking, personal care, sports, attending events, 
+			        seeing friends, TV & radio, other leisure 
+
+
+Time                      The average time spent in a given activity category in total minutes. 
+				  This was averaged from time-use diaries and questionnaires for participants from 
+				  each country 
+
+
+Hours 		        The average time spent in a given activity category converted to a decimal of an hour
+
+
+Duration 		        The average time spent in a given activity category converted to hours & mins format 
+
+
+Cumulative 			  The cumulative sum of hours - 0.5 x hours for that category. This was to define the 
+				  annotation label position in the middle of each category bar
+
+Percent 			  The percentage of total time spent in that activity category 
+
+
+
+Data origins:
+-------------
+
+The data used in this project was sourced from 'Our World In Data' (https://ourworldindata.org/time-use), 
+and was originally collected by The Organisation for Economic Co-operation and Development (OECD), 
+an inter-governmental economic organisation.
+
+Participants completed time-use diaries recording their sequence of activity during 24 hours, 
+alongside specific questionnaires where respondents recalled the proportion of time spent in a specific 
+activity category (information on the questions asked are not detailed in the original data). 
+
+
+Paricipants were aged between 15-64. 
+
+

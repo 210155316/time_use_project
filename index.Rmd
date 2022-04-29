@@ -1,0 +1,536 @@
+---
+title: "index"
+author: "Hannah Timperley"
+date: '2022-04-24'
+output: html_document 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#loading libraries 
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(lubridate)
+library(plotly)
+```
+
+## PSY6422 Final Project
+
+# Introduction and Motivation
+
+As Molly-Mae infamously stated, "we all have the same 24 hours in a day", but how does time expenditure differ across the globe? (Hague & Bartlett, 2022).
+
+With my background as a medical student, I'm aware of how lifestyle-related health conditions vary in prevalence across the world. For example, 60% of Type 2 diabetics are of Asian heritage. (Malik, Willett & Hu, 2012). 
+
+A more detailed understanding of global time-use variance could therefore highlight key lifestyle differences which may be contributing to health inequalities.
+
+This project aimed to gain further insight into time-use variability across across 6 chosen countries: USA, UK, Spain, Poland, China and Korea, casting a specific focus on comparison between European and East Asian time expenditure. 
+
+Thus, the following research questions were outlined:
+
+
+# Reseach Questions
+
+1) Which time-use category is the highest for each country? Which is the lowest?
+
+2) Are there any time-use categories that are significantly different between European and East Asian countries?
+
+Please visit my github repository to access all documentation related to this project! 
+
+# Data Collection
+
+The data used in this project was sourced from 'Our World In Data' 
+(https://ourworldindata.org/time-use), and was originally collected by The Organisation for Economic Co-operation and Development (OECD), an inter-governmental economic organisation.
+
+Participants completed time-use diaries recording their sequence of activity during 24 hours, alongside specific questionnaires where respondents recalled the proportion of time spent in a specific activity category (information on the questions asked are not detailed in the original data). 
+
+The responses from people aged 15-64 were collected from 33 countries, averaged, and sorted into 14 separate activity categories. (Ortiz-Ospina, Giattino & Roser, 2022).
+
+More detailed explanations of the variables used and data origins can be accessed in the codebook here: 
+
+
+# Preparing the data
+```{r}
+#loading the time use data and assigning to variable df 
+df <- read.csv(here("data", "time_use_data.csv"), fileEncoding = 'UTF-8-BOM')
+```
+
+```{r}
+#re-naming dataframe columns 
+df_renamed <- df %>% 
+  rename(country = Country, category = Category,
+         time = Time..minutes.)
+```
+
+```{r}
+#creating data frames of the countries 
+#we want to visualize:
+#korea
+df_korea <- df_renamed %>% 
+  filter(country == "Korea")
+#UK
+df_uk <- df_renamed %>% 
+  filter(country == "UK")
+#China
+df_china <- df_renamed %>% 
+  filter(country == "China")
+
+#Poland 
+df_poland <- df_renamed %>% 
+  filter(country == "Poland")
+
+#USA 
+df_usa <- df_renamed %>% 
+  filter(country == "USA")
+
+#Spain 
+df_spain <- df_renamed %>% 
+  filter(country == "Spain")
+```
+
+I combined the following activities to reduce the number of categories to 9, improving clarity of the visualization:
+
+1) paid work + unpaid work --> work and volunteering
+
+2) housework + care for household members --> household tasks
+
+3) TV&radio + attending events + seeing friends + other leisure --> other leisure
+
+```{r}
+#Combining rows to reduce number of categories
+#for each country:
+#combining rows Korea
+df_korea[15,3] <- df_korea[5,3]+ df_korea[11,3] +
+  df_korea[13,3] + df_korea[14,3]
+df_korea[16,3] <- df_korea[3,3] + df_korea[4,3]
+df_korea[17,3] <- df_korea[1,3] + df_korea[6,3]
+
+#combining rows uk
+df_uk[15,3] <- df_uk[5,3]+ df_uk[11,3] +
+  df_uk[13,3] + df_uk[14,3]
+df_uk[16,3] <- df_uk[3,3] + df_uk[4,3]
+df_uk[17,3] <- df_uk[1,3] + df_uk[6,3]
+
+#combining rows China 
+df_china[15,3] <- df_china[5,3]+ df_china[11,3] +
+  df_china[13,3] + df_china[14,3]
+df_china[16,3] <- df_china[3,3] + df_china[4,3]
+df_china[17,3] <- df_china[1,3] + df_china[6,3]
+
+#combining rows Poland 
+df_poland[15,3] <- df_poland[5,3]+ df_poland[11,3] + df_poland[13,3] + df_poland[14,3]
+df_poland[16,3] <- df_poland[3,3] + df_poland[4,3]
+df_poland[17,3] <- df_poland[1,3] + df_poland[6,3]
+
+#combining rows USA
+df_usa[15,3] <- df_usa[5,3]+ df_usa[11,3] +
+  df_usa[13,3] + df_usa[14,3]
+df_usa[16,3] <- df_usa[3,3] + df_usa[4,3]
+df_usa[17,3] <- df_usa[1,3] + df_usa[6,3]
+
+#combining rows Spain
+df_spain[15,3] <- df_spain[5,3]+ df_spain[11,3] +
+  df_spain[13,3] + df_spain[14,3]
+df_spain[16,3] <- df_spain[3,3] + df_spain[4,3]
+df_spain[17,3] <- df_spain[1,3] + df_spain[6,3]
+```
+
+```{r}
+#assigning new category names to the combined rows
+#for each country:
+#new categories Korea
+df_korea[15,2] <- "Other leisure"
+df_korea[15,1] <- "Korea" 
+df_korea[16,2] <- "Household tasks"
+df_korea[16,1] <- "Korea"
+df_korea[17,2] <- "Work and Volunteering"
+df_korea[17,1] <- "Korea"
+
+#new categories UK 
+df_uk[15,2] <- "Other leisure"
+df_uk[15,1] <- "UK" 
+df_uk[16,2] <- "Household tasks"
+df_uk[16,1] <- "UK"
+df_uk[17,2] <- "Work and Volunteering"
+df_uk[17,1] <- "UK"
+
+#new categories China
+df_china[15,2] <- "Other leisure"
+df_china[15,1] <- "China" 
+df_china[16,2] <- "Household tasks"
+df_china[16,1] <- "China"
+df_china[17,2] <- "Work and Volunteering"
+df_china[17,1] <- "China"
+
+#new categories Poland
+df_poland[15,2] <- "Other leisure"
+df_poland[15,1] <- "Poland" 
+df_poland[16,2] <- "Household tasks"
+df_poland[16,1] <- "Poland"
+df_poland[17,2] <- "Work and Volunteering"
+df_poland[17,1] <- "Poland"
+
+#new categories USA 
+df_usa[15,2] <- "Other leisure"
+df_usa[15,1] <- "USA" 
+df_usa[16,2] <- "Household tasks"
+df_usa[16,1] <- "USA"
+df_usa[17,2] <- "Work and Volunteering"
+df_usa[17,1] <- "USA"
+
+#new categories Spain
+df_spain[15,2] <- "Other leisure"
+df_spain[15,1] <- "Spain" 
+df_spain[16,2] <- "Household tasks"
+df_spain[16,1] <- "Spain"
+df_spain[17,2] <- "Work and Volunteering"
+df_spain[17,1] <- "Spain"
+```
+
+```{r}
+#CREATING FUNCTIONS 
+#FUNCTION_001 --> deleting unnecessary rows 
+function_001 <- function(df){subset(df, category!="Shopping" & 
+                                     category!="Attending events" & 
+                                     category!="TV and Radio" & 
+                                     category!="Other leisure activities" & 
+                                     category!="Housework" & 
+                                     category!="Other unpaid work & volunteering" & 
+                                     category!="Paid work" & 
+                                     category!="Care for household members ")}
+
+#applying to each country data frame 
+df_uk <- function_001(df_uk)
+df_korea <- function_001(df_korea)
+df_china <- function_001(df_china)
+df_poland <- function_001(df_poland)
+df_usa <- function_001(df_usa)
+df_spain <- function_001(df_spain)
+```
+
+```{r}
+#FUNCTION_002 --> creating a duration column which contains time spent in each category
+#in seconds, hours and minutes  
+function_002 <- function(df){
+  mutate(df, duration = dminutes(time))
+  }
+
+#applying to each country data frame
+df_uk <- function_002(df_uk)
+df_korea <- function_002(df_korea)
+df_china <- function_002(df_china)
+df_poland <- function_002(df_poland)
+df_usa <- function_002(df_usa)
+df_spain <- function_002(df_spain)
+```
+
+```{r}
+#FUNCTION_003 --> creating an hours column containing
+#time spent in each category as a decimal of an hour
+function_003 <- function(df){
+  mutate(df, hours = df$time/60)
+}
+
+#applying to each country data frame
+df_uk <- function_003(df_uk)
+df_korea <- function_003(df_korea)
+df_china <- function_003(df_china)
+df_poland <- function_003(df_poland)
+df_usa <- function_003(df_usa)
+df_spain <- function_003(df_spain)
+```
+
+```{r}
+#FUNCTION_004 --> deleting seconds from the duration column
+function_004 <- function(df){
+  df%>% 
+    separate(duration, into = c(NA, "duration"), sep = "~",
+             convert = TRUE, remove = FALSE, fill = "right")
+  
+}
+
+#applying to each country data frame
+df_uk <- function_004(df_uk)
+df_korea <- function_004(df_korea)
+df_china <- function_004(df_china)
+df_poland <- function_004(df_poland)
+df_usa <- function_004(df_usa)
+df_spain <- function_004(df_spain)
+```
+
+```{r}
+#FUNCTION_005 --> deleting unnecessary 
+#bracket from duration column 
+function_005 <- function(df){
+  gsub("[)|]", "",
+     df$duration)}
+
+#applying to each country data frame duration column 
+df_uk$duration <- function_005(df_uk)
+df_korea$duration <- function_005(df_korea)
+df_china$duration <- function_005(df_china)
+df_poland$duration <- function_005(df_poland)
+df_usa$duration <- function_005(df_usa)
+df_spain$duration <- function_005(df_spain)
+```
+
+```{r}
+#FUNCTION_006 --> filtering out durations 
+#containing "minutes"
+function_006 <- function(df){
+  df[grep("minutes", df$duration), ]
+}
+
+#apply to each country data frame and save in a new 
+#data frame in the form country_mins
+uk_mins <- function_006(df_uk)
+korea_mins <- function_006(df_korea)
+china_mins <- function_006(df_china)
+poland_mins <- function_006(df_poland)
+usa_mins <- function_006(df_usa)
+spain_mins <- function_006(df_spain)
+```
+
+```{r}
+#FUNCTION_007 --> filtering out durations
+#containing "hours"
+function_007 <- function(df){
+  df[grep("hours", df$duration), ]
+}
+
+#apply to each country data frame and save in a new
+#data frame in the form country_hours
+uk_hours <- function_007(df_uk)
+korea_hours <- function_007(df_korea)
+china_hours <- function_007(df_china)
+poland_hours <- function_007(df_poland)
+usa_hours <- function_007(df_usa)
+spain_hours <- function_007(df_spain)
+```
+
+```{r}
+#FUNCTION_008 --> deleting the word "hours" from duration column
+function_008 <- function(df){
+   gsub("[hours|]", "", df$duration)
+}
+
+#apply to each country_hours data frame
+uk_hours$duration <- function_008(uk_hours)
+korea_hours$duration <- function_008(korea_hours)
+china_hours$duration <- function_008(china_hours)
+poland_hours$duration <- function_008(poland_hours)
+usa_hours$duration <- function_008(usa_hours)
+spain_hours$duration <- function_008(spain_hours)
+```
+
+```{r}
+#FUNCTION_009 --> converting duration column to numerical data 
+function_009 <- function(df){
+  as.numeric(df$duration)
+}
+
+#applying to each country_hours duration column  
+uk_hours$duration <- function_009(uk_hours)
+korea_hours$duration <- function_009(korea_hours)
+china_hours$duration <- function_009(china_hours)
+poland_hours$duration <- function_009(poland_hours)
+usa_hours$duration <- function_009(usa_hours)
+spain_hours$duration <- function_009(spain_hours)
+```
+
+```{r}
+#FUNCTION_010 --> calculating whole hours
+#and residual minutes
+function_010 <- function(df){
+  {hrs <- floor(df$duration)}
+  {mins <- round(df$duration %% hrs * 60, 0)}
+  {paste0(hrs, "h ", mins, "m")}
+}
+
+#applying to each country_hours duration column 
+uk_hours$duration <- function_010(uk_hours)
+korea_hours$duration <- function_010(korea_hours)
+china_hours$duration <- function_010(china_hours)
+poland_hours$duration <- function_010(poland_hours)
+usa_hours$duration <- function_010(usa_hours)
+spain_hours$duration <- function_010(spain_hours)
+```
+
+```{r}
+#FUNCTION_011 --> combining the country_hours 
+#and country_mins data frames 
+function_011 <- function(df1, df2){
+  rbind(df1, df2)
+}
+#applying to each country data frame 
+df_uk <- function_011(uk_hours, uk_mins)
+df_korea <- function_011(korea_hours, korea_mins)
+df_china <- function_011(china_hours, china_mins)
+df_poland <- function_011(poland_hours, poland_mins)
+df_usa<- function_011(usa_hours, usa_mins)
+df_spain <- function_011(spain_hours, spain_mins)
+```
+
+```{r}
+#FUNCTION_012 --> shortening "minutes" to "m" in duration column 
+function_012 <- function(df){
+  str_replace(df$duration, " minutes", "m")
+}
+
+#applying to each country duration column 
+df_uk$duration <- function_012(df_uk)
+df_korea$duration <- function_012(df_korea)
+df_china$duration <- function_012(df_china)
+df_poland$duration <- function_012(df_poland)
+df_usa$duration <- function_012(df_usa)
+df_spain$duration <- function_012(df_spain)
+```
+
+```{r}
+#FUNCTION_013 --> converting time column to numeric function 
+function_013 <- function(df){
+  as.numeric(df$time)
+}
+#applying to each country data frame  
+function_013(df_uk)
+function_013(df_korea)
+function_013(df_china)
+function_013(df_poland)
+function_013(df_usa)
+function_013(df_spain)
+```
+
+```{r}
+#FUNCTION_014 --> sorting by alphabetical category
+function_014 <- function(df){
+  df[order(df$category),]
+}
+#apply to each country data frame 
+df_uk <- function_014(df_uk)
+df_korea <- function_014(df_korea)
+df_china <- function_014(df_china)
+df_poland <- function_014(df_poland)
+df_usa <- function_014(df_usa)
+df_spain <- function_014(df_spain)
+```
+
+```{r}
+#FUNCTION_015 --> defining label position in the middle
+#of each bar 
+function_015 <- function(df){
+  (cumsum(df$hours) - df$hours/2)
+}
+
+#apply to each country data frame, creating new column "cumulative"
+df_uk$cumulative <- function_015(df_uk)
+df_korea$cumulative <- function_015(df_korea)
+df_china$cumulative <- function_015(df_china)
+df_poland$cumulative <- function_015(df_poland)
+df_usa$cumulative <- function_015(df_usa)
+df_spain$cumulative <- function_015(df_spain)
+```
+
+```{r}
+#FUNCTION_016 --> calculating percentage of time 
+#spent in each category
+function_016 <- function(df){
+  result <- (df / 24) * 100
+  round <- round(result, digits = 1)
+  return(round)
+}
+
+#apply to each country data frame and create 
+#new column "percent"
+df_uk$percent <- function_016(df_uk$hours)
+df_korea$percent <- function_016(df_korea$hours)
+df_china$percent <- function_016(df_china$hours)
+df_poland$percent <- function_016(df_poland$hours)
+df_usa$percent <- function_016(df_usa$hours)
+df_spain$percent <- function_016(df_spain$hours)
+```
+
+```{r}
+#combining all complete dataframes 
+df_all <- rbind(df_uk, df_korea, df_china, 
+                df_poland, df_usa, df_spain)
+```
+
+```{r}
+#defining colour palette
+palette <- colorRampPalette(c("tomato", "orange", "yellow", "green", "lightblue", "pink"))
+
+#defining margins 
+m <- list(
+  l = 0,
+  r = 0, 
+  b = 80, 
+  t = 80, 
+  pad = 0
+)
+```
+
+# Visualising the data 
+
+An interactive stacked bar plot was created using the plot_ly package, allowing clear visual comparison of the proportion of daily time spent in each activity category per country. The percentage of total time spent in each category is detailed in the hover function, providing a more in-depth analysis of the data.
+```{r}
+#PLOTTING AN INTERACTIVE GRAPH WITH PLOTLY 
+#Loading complete data frame into plot_ly function, assigning x variable as hours and y variable as country, assigning each category a colour from palette
+p <- df_all %>% 
+  plot_ly(x=~hours, y=~country, 
+          color=~category, colors = palette(9),
+
+#Plot type bar, adjusting height and width, adding a black line between each bar and assigning percent to the hover information          
+          type = "bar", width=1400, height= 400, 
+          marker = list(line = list(color = "rgba(0, 0, 0, 0.5)", width = 1.5)), 
+          hovertemplate = paste(df_all$percent,"%"))%>%  
+
+#Adjusting layout with title, subtitle, x-axis title, removing zeroline, and increasing number of tickmarks
+  layout(title = "Daily time use by country <br><sup> Averaged from time-use diaries from people aged 15-64 </sup>",
+         xaxis = list(title = "Duration (hours)", zeroline = FALSE, nticks=24), 
+         
+#removing yaxis title and zeroline, and creating a stacked bar chart
+         yaxis = list(title = "", zeroline = FALSE), barmode = "stack", 
+
+#adjusting legend font size and applying margin parameters
+         showlegend = TRUE, legend = list(font = list(size = 10)), margin = m) %>% 
+  
+#adding text labels in bold to the middle of each bar category using cumulative column positions, adjusting font size and removing arrow 
+  add_annotations(text = sprintf("<b>%s</b>", df_all$duration), x = c(df_all$cumulative), 
+                  y=~country, showarrow = FALSE, font = list(size = 5)) %>% 
+  config(displayModeBar = FALSE)
+```
+
+```{r}
+#saving the plot
+library(htmlwidgets)
+saveWidget(p, here("plots", "time_use_plot.html"))
+```
+
+```{r}
+#view plot
+p
+```
+
+## Discussion 
+This project gained an interesting insight into how cultural and geographical differences impact daily time expenditure.
+
+The highest proportion of time spent across the board was in sleep, followed by work/volunteering and leisure. 
+
+Whilst each country has minor differences in time use, it is evident that European countries spend a much smaller proportion of their time working and volunteering, and more on leisure when compared with the East Asian countries in this study. 
+
+Understanding how different cultures spend each day is not only important for forming inclusive relationships, but could also provide insight into lifestyle differences that may contribute to health issues across the world. 
+
+However, as such a large age range is included in this data set, specific age-related lifestyle differences cannot be assessed. 
+
+Thus, moving forward, further time-use data should be collected for a wider range of countries, and separated into smaller age categories to deepen understanding of cultural lifestyle differences and how this changes throughout a lifetime. 
+
+This could be plotted alongside prevelence of lifestyle-related health issues, such as Type 2 diabetes, for each country to investigate whether cultural lifestyle differences significantly impact health outcomes.  
+
+## References 
+Hague, M., & Bartlett, S. (2022). The Diary Of A CEO with Steven Bartlett: E110: Molly Mae: How She Became Creative Director Of PLT At 22 on Apple Podcasts. Retrieved 25 April 2022, from https://podcasts.apple.com/gb/podcast/e110-molly-mae-how-she-became-creative-director-of-plt-at-22/id1291423644?i=1000544772150
+
+Malik, V., Willett, W., & Hu, F. (2012). Global obesity: trends, risk factors and policy implications. Nature Reviews Endocrinology, 9(1), 13-27. doi: 10.1038/nrendo.2012.199 
+
+Ortiz-Ospina, E., Giattino, C., & Roser, M. (2022). Time Use. Retrieved 25 April 2022, from https://ourworldindata.org/time-use 
