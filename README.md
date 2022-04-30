@@ -1,10 +1,10 @@
 # Time Use Project
 PSY6422 final project exploring how daily time use differs across 6 chosen countries: UK, USA, Poland, Spain, China and Korea. 
 
-Link to the full project:  https://hantimps.github.io/time_use_project/
+Link to the full project: https://210155316.github.io/time_use_project/ 
 
-Link to github pages:
-https://github.com/hantimps/time_use_project 
+Link to github pages: https://github.com/210155316/time_use_project
+
 
 This repo contains:
 
