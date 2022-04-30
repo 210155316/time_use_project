@@ -1,6 +1,6 @@
 ---
 title: "index"
-author: "210155316"
+author: "Reg Number: 210155316"
 date: '2022-04-30'
 output: html_document 
 ---
